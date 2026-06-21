@@ -40,13 +40,13 @@ jobs:
           echo "tarball=$TARBALL" >> "$GITHUB_OUTPUT"
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
         with:
           files: ${{ steps.package.outputs.tarball }}
           fail_on_unmatched_files: true
 
       - name: Bump Homebrew formula in tap
-        uses: mislav/bump-homebrew-formula-action@v3
+        uses: mislav/bump-homebrew-formula-action@56a283fa15557e9abaa4bdb63b8212abc68e655c # v3.6
         with:
           formula-name: awstui
           homebrew-tap: mb-dot-dev/homebrew-tap
