@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MbUtils.AwsConsoleTui.ConsoleApp/MbUtils.AwsConsoleTui.ConsoleApp.csproj" />
+    <Project Path="src/MbUtils.AwsConsoleTui.Core/MbUtils.AwsConsoleTui.Core.csproj" />
+    <Project Path="src/MbUtils.AwsConsoleTui.Core.Tests/MbUtils.AwsConsoleTui.Core.Tests.csproj" />
+  </Folder>
+</Solution>
