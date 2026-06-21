@@ -1,9 +1,23 @@
+using System.Reflection;
 using MbUtils.AwsConsoleTui.ConsoleApp.Ui;
 using MbUtils.AwsConsoleTui.Core.Aws;
+using MbUtils.AwsConsoleTui.Core.Cli;
 using MbUtils.AwsConsoleTui.Core.CloudFormation;
 using Terminal.Gui.App;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
+
+// Handle non-interactive flags before touching Terminal.Gui so they work
+// without a TTY (the Homebrew formula self-test runs `awstui --version`).
+switch (StartupArgs.Parse(args))
+{
+    case StartupAction.ShowVersion:
+        Console.WriteLine(GetVersion());
+        return;
+    case StartupAction.ShowHelp:
+        Console.WriteLine(HelpText());
+        return;
+}
 
 // v2 instance-based application lifecycle: Create + Init returns an IApplication
 // that owns its resources and is disposed by the using block (replaces the
@@ -53,8 +67,6 @@ top.Initialized += (_, _) => app.Invoke(() =>
     }
 
     context.Set(profile, region);
-    // Status bar is built now that the profile/region are known, then docked
-    // into the running window.
     top.Add(AppStatusBar.Build(app, context));
     top.SetNeedsDraw();
     stacksView.Reload();
@@ -62,3 +74,22 @@ top.Initialized += (_, _) => app.Invoke(() =>
 
 app.Run(top);
 top.Dispose();
+
+static string GetVersion()
+{
+    var info = Assembly.GetExecutingAssembly()
+        .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "0.0.0";
+    // Strip build metadata (e.g. "0.1.0+abc123" -> "0.1.0").
+    var plus = info.IndexOf('+');
+    return plus >= 0 ? info[..plus] : info;
+}
+
+static string HelpText() =>
+    """
+    awstui — Terminal UI for the AWS Console
+
+    Usage:
+      awstui            Launch the interactive TUI
+      awstui --version  Print the version and exit
+      awstui --help     Show this help and exit
+    """;
