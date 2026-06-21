@@ -85,6 +85,9 @@ Shows `profile | region | status (Ready / Loading… / error)` plus key hints (`
 ### Service views
 Each service opens as its own `Window` (the "tabbed/windowed" desktop-app feel). v1 ships one: the Stacks view.
 
+### Load indicator
+An animated **`SpinnerView`** is the shared load indicator for any async AWS call. It is visible and spinning only while a fetch is in flight and hidden when idle. It sits in the Stacks view's status line (next to the status text) and is reusable by future service views. The StatusBar status field reads `Loading…` in tandem, so the busy state is conveyed both by motion (spinner) and text (status).
+
 ## The Stacks view
 
 A `Window` containing:
@@ -93,8 +96,8 @@ A `Window` containing:
 - A per-view status line.
 
 Behavior:
-- **`F5`** refreshes (re-fetches from AWS).
-- Typing in the filter re-applies `StackFilter` live against the already-loaded list — **no extra API call**.
+- **`F5`** refreshes (re-fetches from AWS); the `SpinnerView` animates while the fetch is in flight.
+- Typing in the filter re-applies `StackFilter` live against the already-loaded list — **no extra API call**, no spinner.
 - Selecting / pressing **Enter** on a row is **wired but no-ops** — the seam for the future Stack Details view.
 
 ## Data flow & async
@@ -109,7 +112,7 @@ Profile/Region dialog
   → TableView
 ```
 
-AWS calls run off the UI thread; results are marshalled back onto the UI thread with `Application.Invoke`. The UI shows a `Loading…` state during the fetch and remains responsive throughout.
+AWS calls run off the UI thread; results are marshalled back onto the UI thread with `Application.Invoke`. While a fetch is in flight the UI shows the animated `SpinnerView` plus a `Loading…` status and remains responsive throughout; both clear when the call completes (or errors).
 
 ## Error handling
 
