@@ -77,6 +77,14 @@ public static class ProfileRegionDialog
             app.RequestStop();
         };
 
+        // Enter on the region list advances to the OK/Cancel buttons instead of
+        // confirming; the user presses Enter again on OK to confirm.
+        regionList.Accepting += (_, e) =>
+        {
+            e.Handled = true;
+            ok.SetFocus();
+        };
+
         var cancel = new Button { Text = "Cancel" };
         cancel.Accepting += (_, e) =>
         {
