@@ -45,9 +45,17 @@ public static class ProfileRegionDialog
         SelectDefault(profileList, profiles, provider.DefaultProfile);
         SelectDefault(regionList, regions, provider.DefaultRegion);
 
+        // Enter on the profile list advances to the region list instead of
+        // confirming; marking handled stops the Accept reaching the OK button.
+        profileList.Accepting += (_, e) =>
+        {
+            e.Handled = true;
+            regionList.SetFocus();
+        };
+
         var help = new Label
         {
-            Text = "Up/Down: choose   Tab: next field   Enter: confirm   Esc: cancel",
+            Text = "Up/Down: choose   Tab: next field   Enter: next / confirm   Esc: cancel",
             X = 1,
             Y = 13,
         };
