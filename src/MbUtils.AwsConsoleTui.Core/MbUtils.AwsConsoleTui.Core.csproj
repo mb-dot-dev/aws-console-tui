@@ -8,6 +8,9 @@
 
   <ItemGroup>
     <PackageReference Include="AWSSDK.CloudFormation" Version="4.*" />
+    <PackageReference Include="AWSSDK.SecurityToken" Version="4.0.7.7" />
+    <PackageReference Include="AWSSDK.SSO" Version="4.0.3.7" />
+    <PackageReference Include="AWSSDK.SSOOIDC" Version="4.0.4.9" />
   </ItemGroup>
 
 </Project>
