@@ -64,11 +64,6 @@ public sealed class StacksView : View
 
         Add(filterLabel, _filter, _spinner, _statusLabel, _table);
 
-        // Start with the table focused so Up/Down navigate the stacks immediately;
-        // Tab moves focus to the filter field. Initialized fires once the view is
-        // part of the running application, when SetFocus takes effect.
-        Initialized += (_, _) => _table.SetFocus();
-
         // API note: KeyDown is EventHandler<Key> in v2.4.7 — second arg is the Key itself,
         // which carries a mutable Handled property to stop further processing.
         KeyDown += (_, key) =>
@@ -119,6 +114,9 @@ public sealed class StacksView : View
                 ApplyFilter();
                 SetLoading(false);
                 _statusLabel.Text = $"{_allStacks.Count} stack(s)";
+                // Focus the table once it has content (and the app is fully running),
+                // so Up/Down navigate the list immediately. Tab moves to the filter.
+                _table.SetFocus();
             });
         }
         catch (Exception ex)

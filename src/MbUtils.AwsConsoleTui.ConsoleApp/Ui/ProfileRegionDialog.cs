@@ -74,7 +74,9 @@ public static class ProfileRegionDialog
             // Mark handled so the Accept command does not propagate past this
             // dialog and stop the main window too (which exits the whole app).
             e.Handled = true;
-            app.RequestStop();
+            // Stop this dialog specifically (not the no-arg "top runnable", which
+            // can bleed into the next app.Run and exit the whole app).
+            app.RequestStop(dialog);
         };
 
         // Enter on the region list advances to the OK/Cancel buttons instead of
@@ -89,7 +91,7 @@ public static class ProfileRegionDialog
         cancel.Accepting += (_, e) =>
         {
             e.Handled = true;
-            app.RequestStop();
+            app.RequestStop(dialog);
         };
 
         // Esc cancels the dialog (leaves result null) without confirming.
@@ -98,7 +100,7 @@ public static class ProfileRegionDialog
             if (key == Key.Esc)
             {
                 key.Handled = true;
-                app.RequestStop();
+                app.RequestStop(dialog);
             }
         };
 
