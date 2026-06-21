@@ -25,6 +25,10 @@ public sealed class StacksView : View
         _serviceFactory = serviceFactory;
         Width = Dim.Fill();
         Height = Dim.Fill();
+        // A base View defaults to CanFocus = false, which would stop focus from
+        // descending into the filter/table subviews (so arrow keys never reach
+        // the table). Make the container focusable so its children can be focused.
+        CanFocus = true;
 
         var filterLabel = new Label { Text = "Filter:", X = 0, Y = 0 };
         _filter = new TextField { X = Pos.Right(filterLabel) + 1, Y = 0, Width = 30 };
