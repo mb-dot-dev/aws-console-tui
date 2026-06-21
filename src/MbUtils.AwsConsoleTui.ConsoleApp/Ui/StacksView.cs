@@ -16,7 +16,7 @@ public sealed class StacksView : View
     private readonly SpinnerView _spinner;
     private readonly Label _statusLabel;
 
-    private IReadOnlyList<StackInfo> _allStacks = Array.Empty<StackInfo>();
+    private IReadOnlyList<StackInfo> _allStacks = [];
     private bool _isLoading;
 
     public StacksView(IApplication app, Func<ICloudFormationService> serviceFactory)
@@ -49,6 +49,8 @@ public sealed class StacksView : View
             Width = Dim.Fill(),
             Height = Dim.Fill(),
             FullRowSelect = true,
+            // One row maps to one stack; disable rubber-band multi-cell selection.
+            MultiSelect = false,
         };
 
         // Row selection seam for a future Stack Details view (intentionally inert in v1).
