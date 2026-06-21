@@ -45,6 +45,7 @@ public class CloudFormationServiceTests
 
         Assert.Equal(3, result.Count);
         Assert.All(result, s => Assert.Equal("CREATE_COMPLETE", s.Status));
+        Assert.Equal(new[] { "one", "three", "two" }, result.Select(s => s.Name).ToArray());
     }
 
     [Fact]

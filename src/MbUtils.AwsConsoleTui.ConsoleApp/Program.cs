@@ -19,10 +19,10 @@ if (profile is null || region is null)
 
 var context = new AwsContext();
 context.Set(profile, region);
-var clientFactory = new AwsClientFactory(context);
+using var clientFactory = new AwsClientFactory(context);
 
 ICloudFormationService ServiceFactory() =>
-    new CloudFormationService(new CloudFormationClient(clientFactory.CreateCloudFormationClient()));
+    new CloudFormationService(new CloudFormationClient(clientFactory.GetCloudFormationClient()));
 
 var stacksView = new StacksView(app, ServiceFactory)
 {

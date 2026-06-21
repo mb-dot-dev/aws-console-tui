@@ -5,17 +5,29 @@ using Amazon.Runtime.CredentialManagement;
 
 namespace MbUtils.AwsConsoleTui.Core.Aws;
 
-public sealed class AwsClientFactory : IAwsClientFactory
+public sealed class AwsClientFactory : IAwsClientFactory, IDisposable
 {
     private readonly IAwsContext _context;
+    private IAmazonCloudFormation? _cloudFormationClient;
 
     public AwsClientFactory(IAwsContext context) => _context = context;
 
-    public IAmazonCloudFormation CreateCloudFormationClient()
+    public IAmazonCloudFormation GetCloudFormationClient()
     {
-        var credentials = ResolveCredentials(_context.ProfileName);
-        var region = RegionEndpoint.GetBySystemName(_context.Region);
-        return new AmazonCloudFormationClient(credentials, region);
+        if (_cloudFormationClient is null)
+        {
+            var credentials = ResolveCredentials(_context.ProfileName);
+            var region = RegionEndpoint.GetBySystemName(_context.Region);
+            _cloudFormationClient = new AmazonCloudFormationClient(credentials, region);
+        }
+
+        return _cloudFormationClient;
+    }
+
+    public void Dispose()
+    {
+        _cloudFormationClient?.Dispose();
+        _cloudFormationClient = null;
     }
 
     private static AWSCredentials ResolveCredentials(string profileName)
