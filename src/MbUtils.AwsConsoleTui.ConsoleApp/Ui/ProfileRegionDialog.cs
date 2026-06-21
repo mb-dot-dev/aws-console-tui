@@ -8,15 +8,14 @@ namespace MbUtils.AwsConsoleTui.ConsoleApp.Ui;
 
 public static class ProfileRegionDialog
 {
-    public static (string? Profile, string? Region) Show(IProfileProvider provider)
+    public static (string? Profile, string? Region) Show(IApplication app, IProfileProvider provider)
     {
         var profiles = provider.GetProfileNames();
         var regions = provider.GetRegions();
 
         if (profiles.Count == 0)
         {
-            // API change: MessageBox.ErrorQuery requires IApplication as first param in v2.4.7
-            MessageBox.ErrorQuery(Application.Instance, "No AWS profiles", "No named profiles found in your AWS config.", "OK");
+            MessageBox.ErrorQuery(app, "No AWS profiles", "No named profiles found in your AWS config.", "OK");
             return (null, null);
         }
 
@@ -56,17 +55,17 @@ public static class ProfileRegionDialog
                 profiles[profileList.SelectedItem.GetValueOrDefault(0)],
                 regions[regionList.SelectedItem.GetValueOrDefault(0)]
             );
-            Application.RequestStop();
+            app.RequestStop();
         };
 
         var cancel = new Button { Text = "Cancel" };
-        cancel.Accepting += (_, _) => Application.RequestStop();
+        cancel.Accepting += (_, _) => app.RequestStop();
 
         dialog.Add(profileLabel, profileList, regionLabel, regionList);
         // API change: Dialog.AddButton() does not exist in v2.4.7; use Buttons property instead
         dialog.Buttons = [ok, cancel];
 
-        Application.Run(dialog);
+        app.Run(dialog);
         dialog.Dispose();
         return result;
     }

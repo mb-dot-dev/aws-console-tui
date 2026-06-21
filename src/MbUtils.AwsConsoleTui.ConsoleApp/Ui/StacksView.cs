@@ -9,6 +9,7 @@ namespace MbUtils.AwsConsoleTui.ConsoleApp.Ui;
 
 public sealed class StacksView : View
 {
+    private readonly IApplication _app;
     private readonly Func<ICloudFormationService> _serviceFactory;
     private readonly TextField _filter;
     private readonly TableView _table;
@@ -18,8 +19,9 @@ public sealed class StacksView : View
     private IReadOnlyList<StackInfo> _allStacks = Array.Empty<StackInfo>();
     private bool _isLoading;
 
-    public StacksView(Func<ICloudFormationService> serviceFactory)
+    public StacksView(IApplication app, Func<ICloudFormationService> serviceFactory)
     {
+        _app = app;
         _serviceFactory = serviceFactory;
         Width = Dim.Fill();
         Height = Dim.Fill();
@@ -85,8 +87,8 @@ public sealed class StacksView : View
         {
             var service = _serviceFactory();
             var stacks = await service.ListStacksAsync(CancellationToken.None);
-            // Marshal back to the UI thread via Application.Invoke(Action).
-            Application.Invoke(() =>
+            // Marshal back to the UI thread via the application instance's Invoke.
+            _app.Invoke(() =>
             {
                 _allStacks = stacks;
                 ApplyFilter();
@@ -96,12 +98,11 @@ public sealed class StacksView : View
         }
         catch (Exception ex)
         {
-            Application.Invoke(() =>
+            _app.Invoke(() =>
             {
                 SetLoading(false);
                 _statusLabel.Text = "Error";
-                // API change: MessageBox.ErrorQuery requires IApplication as first arg in v2.4.7.
-                MessageBox.ErrorQuery(Application.Instance, "Failed to load stacks", ex.Message, "OK");
+                MessageBox.ErrorQuery(_app, "Failed to load stacks", ex.Message, "OK");
             });
         }
     }
@@ -123,6 +124,9 @@ public sealed class StacksView : View
         _table.SetNeedsDraw();
     }
 
+    // Sets the loading state (reentrancy guard, spinner visibility/animation, and the "Loading…" label).
+    // Intentionally does NOT set _statusLabel.Text when loading == false — the caller owns the idle
+    // status text (success count or "Error") and sets it explicitly after calling SetLoading(false).
     private void SetLoading(bool loading)
     {
         _isLoading = loading;

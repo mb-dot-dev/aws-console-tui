@@ -6,8 +6,8 @@ namespace MbUtils.AwsConsoleTui.ConsoleApp.Ui;
 
 public static class AppMenu
 {
-    // onShowStacks is wired by Task 7; null keeps the item inert until then.
-    public static MenuBar Build(Action? onShowStacks = null)
+    // onShowStacks wires the active CloudFormation > Stacks item; null keeps it inert.
+    public static MenuBar Build(IApplication app, Action? onShowStacks = null)
     {
         // API change: MenuItem.CanExecute does not exist in v2.4.7; use Enabled property instead.
         // API change: MenuItem(title, help, action) 3-arg ctor doesn't exist; use (commandText, helpText, action, Key) and pass Key.Empty.
@@ -23,7 +23,7 @@ public static class AppMenu
         [
             new MenuBarItem("_File",
             [
-                new MenuItem("_Quit", "Exit the application", () => Application.RequestStop(), Key.Empty),
+                new MenuItem("_Quit", "Exit the application", () => app.RequestStop(), Key.Empty),
             ]),
             new MenuBarItem("_CloudFormation",
             [
