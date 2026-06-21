@@ -45,23 +45,48 @@ public static class ProfileRegionDialog
         SelectDefault(profileList, profiles, provider.DefaultProfile);
         SelectDefault(regionList, regions, provider.DefaultRegion);
 
+        var help = new Label
+        {
+            Text = "Up/Down: choose   Tab: next field   Enter: confirm   Esc: cancel",
+            X = 1,
+            Y = 13,
+        };
+
         (string? Profile, string? Region) result = (null, null);
 
         var ok = new Button { Text = "OK", IsDefault = true };
-        ok.Accepting += (_, _) =>
+        ok.Accepting += (_, e) =>
         {
-            // API change: SelectedItem is int? (nullable) in v2.4.7
+            // SelectedItem is int? in v2.4.7; both lists always have a selection
+            // (pre-seeded with defaults / index 0), so GetValueOrDefault(0) is safe.
             result = (
                 profiles[profileList.SelectedItem.GetValueOrDefault(0)],
                 regions[regionList.SelectedItem.GetValueOrDefault(0)]
             );
+            // Mark handled so the Accept command does not propagate past this
+            // dialog and stop the main window too (which exits the whole app).
+            e.Handled = true;
             app.RequestStop();
         };
 
         var cancel = new Button { Text = "Cancel" };
-        cancel.Accepting += (_, _) => app.RequestStop();
+        cancel.Accepting += (_, e) =>
+        {
+            e.Handled = true;
+            app.RequestStop();
+        };
 
-        dialog.Add(profileLabel, profileList, regionLabel, regionList);
+        // Esc cancels the dialog (leaves result null) without confirming.
+        dialog.KeyDown += (_, key) =>
+        {
+            if (key == Key.Esc)
+            {
+                key.Handled = true;
+                app.RequestStop();
+            }
+        };
+
+        dialog.Add(profileLabel, profileList, regionLabel, regionList, help);
         // API change: Dialog.AddButton() does not exist in v2.4.7; use Buttons property instead
         dialog.Buttons = [ok, cancel];
 
