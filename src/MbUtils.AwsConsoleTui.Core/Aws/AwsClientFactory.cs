@@ -2,6 +2,7 @@ using Amazon;
 using Amazon.CloudFormation;
 using Amazon.Runtime;
 using Amazon.Runtime.CredentialManagement;
+using Amazon.Runtime.Credentials;
 
 namespace MbUtils.AwsConsoleTui.Core.Aws;
 
@@ -39,6 +40,6 @@ public sealed class AwsClientFactory : IAwsClientFactory, IDisposable
             return creds;
         }
 
-        return FallbackCredentialsFactory.GetCredentials();
+        return DefaultAWSCredentialsIdentityResolver.GetCredentials();
     }
 }
