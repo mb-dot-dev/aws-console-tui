@@ -67,6 +67,20 @@ public sealed class StacksView : View
                 Reload();
                 key.Handled = true;
             }
+            else if (key == Key.Tab || key == Key.Tab.WithShift)
+            {
+                // Cycle focus between the filter field and the stacks table.
+                if (_filter.HasFocus)
+                {
+                    _table.SetFocus();
+                }
+                else
+                {
+                    _filter.SetFocus();
+                }
+
+                key.Handled = true;
+            }
         };
     }
 
