@@ -11,14 +11,7 @@ using Terminal.Gui.Views;
 using IApplication app = Application.Create().Init();
 
 var profileProvider = new ProfileProvider();
-var (profile, region) = ProfileRegionDialog.Show(app, profileProvider);
-if (profile is null || region is null)
-{
-    return;
-}
-
 var context = new AwsContext();
-context.Set(profile, region);
 using var clientFactory = new AwsClientFactory(context);
 
 ICloudFormationService ServiceFactory() =>
@@ -32,7 +25,6 @@ var stacksView = new StacksView(app, ServiceFactory)
 };
 
 var menu = AppMenu.Build(app, onShowStacks: stacksView.Reload);
-var status = AppStatusBar.Build(app, context);
 
 var content = new Window
 {
@@ -46,10 +38,27 @@ content.Add(stacksView);
 
 // Window serves as the top-level IRunnable (Toplevel was removed in v2).
 var top = new Window();
-top.Add(menu, content, status);
+top.Add(menu, content);
 
-// Initialized fires once on first run — load the stacks on startup.
-top.Initialized += (_, _) => stacksView.Reload();
+// Run the main window once. Once its loop is live, show the profile/region
+// picker as a modal on top of it (the v2 session-stack pattern). Deferring with
+// app.Invoke ensures the main loop is iterating before the nested modal runs.
+top.Initialized += (_, _) => app.Invoke(() =>
+{
+    var (profile, region) = ProfileRegionDialog.Show(app, profileProvider);
+    if (profile is null || region is null)
+    {
+        app.RequestStop(top);
+        return;
+    }
+
+    context.Set(profile, region);
+    // Status bar is built now that the profile/region are known, then docked
+    // into the running window.
+    top.Add(AppStatusBar.Build(app, context));
+    top.SetNeedsDraw();
+    stacksView.Reload();
+});
 
 app.Run(top);
 top.Dispose();
