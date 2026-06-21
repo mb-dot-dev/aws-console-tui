@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using MbUtils.AwsConsoleTui.Core.Aws;
 using Terminal.Gui.App;
 using Terminal.Gui.Input;
+using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 
 namespace MbUtils.AwsConsoleTui.ConsoleApp.Ui;
@@ -22,22 +23,33 @@ public static class ProfileRegionDialog
         var dialog = new Dialog
         {
             Title = "Select AWS Profile and Region",
-            Width = 60,
-            Height = 18,
+            Width = 76,
+            Height = 20,
         };
 
-        var profileLabel = new Label { Text = "Profile:", X = 1, Y = 0 };
+        // Help line at the top so it never collides with the dialog's button row.
+        var help = new Label
+        {
+            Text = "Up/Down: choose   Tab: next field   Enter: next / confirm   Esc: cancel",
+            X = 1,
+            Y = 0,
+        };
+
+        var profileLabel = new Label { Text = "Profile:", X = 1, Y = 2 };
         var profileList = new ListView
         {
-            X = 1, Y = 1, Width = 26, Height = 12,
+            // Wide enough for long profile names (e.g. SSO profiles). Dim.Fill(2)
+            // grows the list to the dialog height, leaving the bottom rows for the
+            // button row so the last entry is never clipped.
+            X = 1, Y = 3, Width = 40, Height = Dim.Fill(2),
             // API change: ListWrapper<T> ctor takes ObservableCollection<T>, not List<T>
             Source = new ListWrapper<string>(new ObservableCollection<string>(profiles)),
         };
 
-        var regionLabel = new Label { Text = "Region:", X = 30, Y = 0 };
+        var regionLabel = new Label { Text = "Region:", X = 44, Y = 2 };
         var regionList = new ListView
         {
-            X = 30, Y = 1, Width = 26, Height = 12,
+            X = 44, Y = 3, Width = 28, Height = Dim.Fill(2),
             // API change: ListWrapper<T> ctor takes ObservableCollection<T>, not List<T>
             Source = new ListWrapper<string>(new ObservableCollection<string>(regions)),
         };
@@ -51,13 +63,6 @@ public static class ProfileRegionDialog
         {
             e.Handled = true;
             regionList.SetFocus();
-        };
-
-        var help = new Label
-        {
-            Text = "Up/Down: choose   Tab: next field   Enter: next / confirm   Esc: cancel",
-            X = 1,
-            Y = 13,
         };
 
         (string? Profile, string? Region) result = (null, null);
