@@ -23,7 +23,7 @@ git push origin v0.1.0
 
 The `release` workflow builds the `osx-arm64` single-file binary, creates a
 GitHub Release with `awstui-0.1.0-osx-arm64.tar.gz`, and updates the tap
-formula.
+formula. The formula change is committed directly to the tap (no pull request to merge) — this is why the `HOMEBREW_TAP_TOKEN` needs Contents: write on the tap repo.
 
 ## Installing (end users)
 

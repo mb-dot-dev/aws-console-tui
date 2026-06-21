@@ -51,5 +51,6 @@ jobs:
           formula-name: awstui
           homebrew-tap: mb-dot-dev/homebrew-tap
           download-url: https://github.com/mb-dot-dev/aws-console-tui/releases/download/${{ github.ref_name }}/${{ steps.package.outputs.tarball }}
+          create-pullrequest: false
         env:
           COMMITTER_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
